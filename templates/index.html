@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Permission Auditor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+           <span class="badge">🛡 Mobile Security Tool</span>
+<h1>APK Permission Auditor</h1>
+<p class="subtitle">Analizá qué permisos declara una app Android antes de instalarla</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <p class="flash">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form action="/analyze" method="post" enctype="multipart/form-data" class="upload-form">
+            <label for="apk_file" class="file-label">
+                <span id="file-label-text">Elegí un archivo .apk</span>
+                <input type="file" id="apk_file" name="apk_file" accept=".apk" required>
+            </label>
+            <button type="submit">Analizar</button>
+        </form>
+
+        {% if result %}
+        <section class="result">
+            <h2>{{ result.app_name }}</h2>
+            <p class="meta">
+                <strong>Paquete:</strong> {{ result.package }}<br>
+                <strong>Versión:</strong> {{ result.version }}
+            </p>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <span class="stat-number">{{ result.total_permissions }}</span>
+                    <span class="stat-label">Permisos totales</span>
+                </div>
+                <div class="stat-box danger">
+                    <span class="stat-number">{{ result.dangerous_count }}</span>
+                    <span class="stat-label">Permisos peligrosos</span>
+                </div>
+            </div>
+
+            {% if result.high_risk_warning %}
+            <div class="warning">
+                ⚠ Esta app declara muchos permisos peligrosos. Revisá si todos son
+                realmente necesarios para su función.
+            </div>
+            {% endif %}
+
+            {% if result.dangerous_permissions %}
+            <div class="permission-group">
+                <h3>Permisos peligrosos</h3>
+                <ul class="permission-list dangerous">
+                    {% for p in result.dangerous_permissions %}
+                    <li>⚠ {{ p }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if result.normal_permissions %}
+            <div class="permission-group">
+                <h3>Otros permisos</h3>
+                <ul class="permission-list">
+                    {% for p in result.normal_permissions %}
+                    <li>{{ p }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </section>
+        {% endif %}
+
+        <footer>
+            <p>Código abierto en <a href="https://github.com/juanpablocode-sudo/apk-permission-auditor" target="_blank">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Mostrar el nombre del archivo elegido en vez del texto genérico
+        const fileInput = document.getElementById('apk_file');
+        const fileLabelText = document.getElementById('file-label-text');
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileLabelText.textContent = fileInput.files[0].name;
+            }
+        });
+    </script>
+</body>
+</html>

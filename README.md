@@ -10,7 +10,7 @@ Subís un APK, la app extrae los permisos declarados en el
 
 ## Demo
 
-🔗 [Link a la demo en vivo](#) *(agregar una vez deployado en Render)*
+🔗 [Link a la demo en vivo](#) 
 
 ## Uso local
 
